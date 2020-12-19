@@ -49,14 +49,15 @@ Page({
       return;
     }
     // 后端验证
-    let result = await request('/login/cellphone', {phone, password})
-    console.log(result.data.code);
+    let result = await request('/login/cellphone', {phone, password,isLogin:true})
+    // console.log(result.data.code);
     if (result.data.code === 200) {
       wx.showToast({
         title: '登录成功',
       })
-      // 成功后取个人中心
-      wx.switchTab({
+      wx.setStorageSync('userinfo', JSON.stringify(result.data.profile))
+      // 成功后去个人中心
+      wx.reLaunch({
         url: '/pages/personal/personal',
       })
     } else if (result.data.code === 400) {

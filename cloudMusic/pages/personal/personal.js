@@ -9,7 +9,9 @@ Page({
    */
   data: {
     coverTransform: 'translateY(0)',
-    coveTransition: ''
+    coveTransition: '',
+    userInfo: {},
+    userInfoRecentPlayList: []
   },
   handleTouchStart(event) {
     this.setData({
@@ -39,15 +41,35 @@ Page({
   },
   toLogin() {
     // 跳转到登录界面
-    wx.navigateTo({
-      url: '/pages/login/login'
+    if(!this.data.userInfo) {
+      wx.navigateTo({
+        url: '/pages/login/login'
+      })
+    }
+  },
+  async getUserInfoRecentPlayList(userId) {
+    let userInfoRecentPlayList = await request('/user/record', {uid:userId, type: 0})
+    console.log(userInfoRecentPlayList.data);
+    let index = 0;
+    let recentPlayList = Array.from(userInfoRecentPlayList.data.allData).map(item => {
+      item.id = index++;
+      return item;
+    })
+    this.setData({
+      userInfoRecentPlayList: recentPlayList
     })
   },
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    let userInfo = wx.getStorageSync('userinfo')
+    if(userInfo) {
+      this.setData({
+        userInfo: JSON.parse(userInfo)
+      })
+    }
+    this.getUserInfoRecentPlayList(this.data.userInfo.userId)
   },
 
   /**

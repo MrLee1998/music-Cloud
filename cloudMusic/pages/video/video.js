@@ -1,18 +1,53 @@
 // pages/video/video.js
+import requset from '../../utils/request'
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    videoGroupList: [],
+    navId: '',
+    videoList: []
   },
-
+  async getVideoGroupList(){
+    let res = await requset('/video/group/list')
+    console.log(res.data);
+    let videoData = res.data.data.splice(0,14);
+    this.setData({
+      videoGroupList: videoData,
+      navId: videoData[0].id
+    })
+    this.getVideoList(this.data.navId)
+  },
+  async getVideoList(navId) {
+    if(navId) {
+      let video = await requset('/video/group', {id: navId})
+      console.log(video);
+      console.log(video);
+      this.setData({
+        videoList: video
+      })
+    } else {
+      return;
+    }
+    
+  },
+  changeNav(event) {
+    let res = event.currentTarget.id
+    console.log(event.currentTarget);
+    this.setData({
+      navId: res>>>0,
+      videoList: []
+    })
+    this.getVideoList(this.data.navId)
+  },
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.getVideoGroupList()
+  
   },
 
   /**
